@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>VMP Warne System · Cloud</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Vazir:wght@300;400;700;900&display=swap" rel="stylesheet"/>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        :root{--bg:#0b0e14;--bg2:#141a24;--card:rgba(24,31,42,0.7);--border:#2e3848;--text:#eef2f6;--text2:#889abb;--gold:#f5b342;--gold-grad:linear-gradient(135deg,#f0b34b,#f7d875);--danger:#dc3d3d;--warning:#dc8a3d;--success:#44b87a;--info:#3d8adc}
+        body{font-family:'Vazir',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding:1.5rem 1rem}
+        .container{max-width:1440px;margin:0 auto}
+        .header{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;margin-bottom:2rem;padding-bottom:1.2rem;border-bottom:1px solid rgba(255,255,255,0.04)}
+        .header-title{font-weight:900;font-size:2rem;background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .header-title i{margin-left:0.6rem;color:var(--gold);-webkit-text-fill-color:var(--gold)}
+        .header-actions{display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap}
+        .badge-warne{background:#2c1f1a;padding:0.5rem 1.4rem;border-radius:40px;font-weight:700;font-size:0.9rem;border:1px solid #dc6b3d30;color:#f5b38b}
+        .badge-warne i{color:#e6844a;margin-left:8px}
+        .admin-badge{background:#1a2c2a;padding:0.5rem 1.4rem;border-radius:40px;font-weight:700;font-size:0.9rem;border:1px solid #3ddc8a30;color:#8bddb0}
+        .admin-badge i{color:#6bcb9a;margin-left:8px}
+        .btn{background:#1f2a3a;border:none;color:#d4dfee;padding:0.6rem 1.5rem;border-radius:60px;font-weight:700;font-size:0.85rem;display:inline-flex;align-items:center;gap:8px;cursor:pointer;border:1px solid #2f3b4e;transition:all .2s;font-family:'Vazir',sans-serif}
+        .btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(0,0,0,0.5)}
+        .btn-primary{background:rgba(245,179,66,0.15);border-color:rgba(245,179,66,0.3);color:#f5dbaa}
+        .btn-primary i{color:var(--gold)}
+        .btn-danger{background:rgba(220,61,61,0.15);border-color:rgba(220,61,61,0.3);color:#f5a3a3}
+        .btn-danger i{color:var(--danger)}
+        .btn-success{background:rgba(68,184,122,0.15);border-color:rgba(68,184,122,0.3);color:#8bddb0}
+        .btn-success i{color:var(--success)}
+        .btn-outline{background:transparent;border:1px solid #3d4a60}
+        .btn-xs{padding:0.15rem 0.6rem;font-size:0.6rem}
+        .sync-status{font-size:0.7rem;color:var(--text2);padding:0.3rem 1rem;border-radius:30px;background:rgba(0,0,0,0.3)}
+        .sync-status.online{color:var(--success);border:1px solid rgba(68,184,122,0.3)}
+        .sync-status.offline{color:var(--danger);border:1px solid rgba(220,61,61,0.3)}
+        .sync-status.syncing{color:var(--warning);border:1px solid rgba(220,138,61,0.3);animation:pulse 1s infinite}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1rem;margin-bottom:2rem}
+        .stat-card{background:var(--card);padding:1.2rem;border-radius:1.5rem;border:1px solid var(--border);text-align:center;transition:0.2s}
+        .stat-card:hover{border-color:var(--gold)}
+        .stat-card .number{font-size:2rem;font-weight:900;background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .stat-card .number.danger{background:linear-gradient(135deg,#dc3d3d,#dc5a5a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .stat-card .number.warning{background:linear-gradient(135deg,#dc8a3d,#f5b342);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .stat-card .number.success{background:linear-gradient(135deg,#44b87a,#6bcb9a);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .stat-card .label{color:var(--text2);font-size:0.8rem;margin-top:0.3rem}
+        .filters-bar{display:flex;flex-wrap:wrap;gap:0.8rem;margin-bottom:1.5rem;align-items:center;background:var(--bg2);padding:1rem 1.5rem;border-radius:2rem;border:1px solid var(--border)}
+        .filters-bar input,.filters-bar select{padding:0.5rem 1rem;border-radius:60px;background:#0d121b;border:1px solid var(--border);color:var(--text);font-size:0.85rem;outline:none;font-family:'Vazir',sans-serif;min-width:150px}
+        .filters-bar input:focus,.filters-bar select:focus{border-color:var(--gold);box-shadow:0 0 20px rgba(245,179,66,0.1)}
+        .admin-summary{background:var(--bg2);border-radius:1.5rem;padding:1.5rem;margin-bottom:2rem;border:1px solid var(--border)}
+        .admin-summary h3{margin-bottom:1rem;color:#d4dfee}
+        .admin-summary h3 i{color:var(--gold);margin-left:8px}
+        .admin-summary-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:0.8rem}
+        .admin-item{background:rgba(0,0,0,0.3);padding:0.7rem 1rem;border-radius:1rem;display:flex;justify-content:space-between;align-items:center;border-left:4px solid var(--border);transition:0.2s;cursor:pointer}
+        .admin-item:hover{border-left-color:var(--gold);background:rgba(245,179,66,0.05)}
+        .admin-item .admin-info{display:flex;flex-direction:column}
+        .admin-item .admin-name{font-weight:700;color:var(--text);font-size:0.9rem}
+        .admin-item .admin-rank{font-size:0.7rem;color:#71b6f0}
+        .admin-item .admin-count{font-weight:900;font-size:1rem;padding:0.1rem 0.6rem;border-radius:30px}
+        .admin-item .admin-count.safe{background:#1a3a2a;color:#8bddb0}
+        .admin-item .admin-count.warning{background:#3d2d1a;color:#f5b38b}
+        .admin-item .admin-count.danger{background:#3d1a1a;color:#dc5a5a}
+        .warne-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(380px,1fr));gap:1.5rem;margin:2rem 0}
+        .warne-card{background:var(--card);backdrop-filter:blur(6px);padding:1.5rem;border-radius:2rem;border:1px solid var(--border);transition:all .3s;position:relative}
+        .warne-card:hover{border-color:var(--gold);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,0.5)}
+        .warne-card .priority-badge{position:absolute;top:-8px;right:20px;padding:0.2rem 1rem;border-radius:30px;font-size:0.6rem;font-weight:700;color:#fff}
+        .warne-card .priority-badge.critical{background:var(--danger)}
+        .warne-card .priority-badge.warning{background:var(--warning)}
+        .warne-card .priority-badge.info{background:var(--info)}
+        .warne-card .warne-number{position:absolute;top:-8px;left:20px;background:#1f2a3a;padding:0.1rem 0.7rem;border-radius:30px;font-size:0.6rem;color:var(--text2);border:1px solid var(--border)}
+        .warne-card .warne-id{position:absolute;bottom:10px;left:15px;font-size:0.55rem;color:#3f4d63}
+        .warne-admin{display:flex;align-items:center;gap:10px;margin:0.5rem 0;padding:0.5rem;background:rgba(255,255,255,0.03);border-radius:12px}
+        .warne-admin .admin-avatar{width:38px;height:38px;border-radius:50%;background:var(--gold-grad);display:flex;align-items:center;justify-content:center;font-weight:900;color:#0b0e14;font-size:1rem;flex-shrink:0}
+        .warne-admin .admin-info{flex:1}
+        .warne-admin .admin-name{font-weight:700;font-size:0.95rem;color:var(--text)}
+        .warne-admin .admin-rank{font-size:0.7rem;color:#71b6f0}
+        .warne-admin .admin-score{font-size:0.7rem;padding:0.1rem 0.6rem;border-radius:30px;background:rgba(220,61,61,0.15);color:#dc5a5a}
+        .warne-title{font-size:1rem;font-weight:700;margin:0.5rem 0 0.3rem;color:var(--text)}
+        .warne-title i{color:#71b6f0;margin-left:5px}
+        .warne-desc{color:var(--text2);font-size:0.85rem;line-height:1.6;margin:0.5rem 0;padding:0.5rem;background:rgba(0,0,0,0.2);border-radius:12px}
+        .warne-meta{display:flex;justify-content:space-between;align-items:center;margin-top:1rem;padding-top:0.8rem;border-top:1px dashed #2b364a;font-size:0.7rem;color:var(--text2);flex-wrap:wrap;gap:0.3rem}
+        .warne-meta .time i{margin-left:4px;color:var(--gold)}
+        .warne-meta .status{padding:0.15rem 0.7rem;border-radius:30px;font-size:0.6rem;font-weight:700}
+        .status.open{background:#1a3a2a;color:#8bddb0;border:1px solid rgba(68,184,122,0.3)}
+        .status.resolved{background:#1a2a3a;color:#8bbddb;border:1px solid rgba(68,184,219,0.3)}
+        .status.rejected{background:#3a1a1a;color:#dc5a5a;border:1px solid rgba(220,61,61,0.3)}
+        .warne-actions{display:flex;gap:0.3rem;margin-top:0.5rem;justify-content:flex-end;flex-wrap:wrap}
+        .add-warne-section{background:var(--bg2);border-radius:2rem;padding:2rem;margin:2rem 0;border:1px solid var(--border);display:none}
+        .add-warne-section.visible{display:block;animation:fadeIn .3s}
+        @keyframes fadeIn{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:translateY(0)}}
+        .form-group{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem}
+        .form-group.full{grid-template-columns:1fr}
+        .form-group input,.form-group select,.form-group textarea{width:100%;padding:0.8rem 1.2rem;border-radius:60px;background:#0d121b;border:1px solid var(--border);color:var(--text);font-size:0.9rem;outline:none;transition:0.2s;font-family:'Vazir',sans-serif}
+        .form-group textarea{border-radius:1.5rem;min-height:70px;resize:vertical}
+        .form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--gold);box-shadow:0 0 20px rgba(245,179,66,0.1)}
+        .form-actions{display:flex;gap:1rem;justify-content:flex-end;margin-top:1rem;flex-wrap:wrap}
+        .login-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.9);backdrop-filter:blur(12px);display:none;align-items:center;justify-content:center;z-index:9999}
+        .login-overlay.show{display:flex}
+        .login-box{background:linear-gradient(145deg,#1a212d,#11171f);padding:3rem 2.5rem;border-radius:3rem;border:1px solid var(--border);max-width:400px;width:100%;box-shadow:0 30px 60px rgba(0,0,0,0.8)}
+        .login-box h2{font-weight:900;font-size:1.8rem;margin-bottom:0.5rem;background:var(--gold-grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .login-box p{color:var(--text2);font-size:0.9rem;margin-bottom:2rem}
+        .login-box input{width:100%;padding:0.9rem 1.2rem;border-radius:60px;background:#0d121b;border:1px solid var(--border);color:var(--text);font-size:1rem;margin-bottom:1rem;outline:none;transition:0.2s;font-family:'Vazir',sans-serif}
+        .login-box input:focus{border-color:var(--gold);box-shadow:0 0 20px rgba(245,179,66,0.1)}
+        .login-box .btn-login{width:100%;padding:0.9rem;border-radius:60px;background:var(--gold-grad);border:none;color:#0b0e14;font-weight:900;font-size:1.1rem;cursor:pointer;transition:0.2s;font-family:'Vazir',sans-serif}
+        .login-box .btn-login:hover{transform:scale(1.02);box-shadow:0 8px 30px rgba(245,179,66,0.3)}
+        .login-error{color:var(--danger);font-size:0.8rem;margin-top:0.5rem;text-align:center}
+        .modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center;z-index:10000}
+        .modal-overlay.show{display:flex}
+        .modal-box{background:#1a212d;padding:2rem;border-radius:2rem;border:1px solid var(--border);max-width:450px;width:90%;text-align:center}
+        .modal-box h3{color:var(--danger);margin-bottom:1rem}
+        .modal-box p{color:var(--text2);margin-bottom:1.5rem}
+        .modal-box .modal-actions{display:flex;gap:1rem;justify-content:center}
+        .toast{position:fixed;bottom:30px;right:30px;background:#1a212d;padding:0.8rem 1.8rem;border-radius:60px;border:1px solid var(--border);color:var(--text);font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,0.8);z-index:999;display:none;align-items:center;gap:10px;font-size:0.9rem;max-width:90%}
+        .toast.show{display:flex;animation:slideUp .3s}
+        .toast.success{border-color:var(--success)}
+        .toast.success i{color:var(--success)}
+        .toast.error{border-color:var(--danger)}
+        .toast.error i{color:var(--danger)}
+        .toast.warning{border-color:var(--warning)}
+        .toast.warning i{color:var(--warning)}
+        .toast.info{border-color:var(--info)}
+        .toast.info i{color:var(--info)}
+        @keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .empty-state{text-align:center;padding:4rem 2rem;color:var(--text2);grid-column:1/-1}
+        .empty-state i{font-size:3rem;color:var(--border);margin-bottom:1rem}
+        .empty-state .sub-text{font-size:0.8rem;color:#3f4d63;margin-top:0.5rem}
+        .loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;z-index:99999;flex-direction:column;gap:1rem}
+        .loading-overlay.show{display:flex}
+        .loading-overlay .spinner{width:50px;height:50px;border:4px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .loading-overlay p{color:var(--text2);font-size:1rem}
+        @media(max-width:650px){.header{flex-direction:column;align-items:flex-start;gap:1rem}.header-actions{flex-wrap:wrap;width:100%}.form-group{grid-template-columns:1fr}.warne-grid{grid-template-columns:1fr}.login-box{padding:2rem 1.5rem;margin:1rem}.toast{left:20px;right:20px;bottom:20px}.stats-grid{grid-template-columns:1fr 1fr}.admin-summary-grid{grid-template-columns:1fr}.filters-bar{flex-direction:column;align-items:stretch}.filters-bar input,.filters-bar select{min-width:unset}}
+        ::-webkit-scrollbar{width:6px;background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border);border-radius:20px}
+    </style>
+</head>
+<body>
+
+    <!-- ===== LOADING ===== -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="spinner"></div>
+        <p>در حال همگام‌سازی با ابر...</p>
+    </div>
+
+    <!-- ===== LOGIN ===== -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <h2><i class="fas fa-shield-alt"></i> ورود ادمین</h2>
+            <p>برای نوشتن وارن جدید، رمز ادمین را وارد کنید</p>
+            <input type="password" id="adminPassword" placeholder="رمز عبور ادمین" />
+            <button class="btn-login" onclick="loginAdmin()">
+                <i class="fas fa-key"></i> ورود
+            </button>
+            <div class="login-error" id="loginError"></div>
+            <button class="btn btn-outline" style="margin-top:1rem; width:100%; justify-content:center;" onclick="closeLogin()">
+                <i class="fas fa-times"></i> لغو
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== CONFIRM ===== -->
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal-box">
+            <h3><i class="fas fa-exclamation-triangle"></i> تایید عملیات</h3>
+            <p id="confirmMessage">آیا از انجام این عملیات مطمئن هستید؟</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeConfirm()">لغو</button>
+                <button class="btn btn-danger" id="confirmActionBtn" onclick="executeConfirm()">
+                    <i class="fas fa-check"></i> تایید
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">عملیات موفق</span>
+    </div>
+
+    <!-- ===== MAIN ===== -->
+    <div class="container">
+
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-title">
+                <i class="fas fa-cloud"></i> VMP Warne System
+            </div>
+            <div class="header-actions">
+                <div class="badge-warne">
+                    <i class="fas fa-exclamation-triangle"></i> <span id="countDisplay">۰</span> وارن
+                </div>
+                <div class="admin-badge" id="adminBadge" style="display:none;">
+                    <i class="fas fa-crown"></i> ادمین
+                </div>
+                <span class="sync-status" id="syncStatus">
+                    <i class="fas fa-circle"></i> در حال اتصال...
+                </span>
+                <button class="btn btn-outline" onclick="syncWithCloud()">
+                    <i class="fas fa-sync-alt"></i> همگام‌سازی
+                </button>
+                <button class="btn btn-primary" id="adminLoginBtn" onclick="showLogin()">
+                    <i class="fas fa-user-shield"></i> ورود ادمین
+                </button>
+                <button class="btn btn-danger" id="adminLogoutBtn" style="display:none;" onclick="logoutAdmin()">
+                    <i class="fas fa-sign-out-alt"></i> خروج
+                </button>
+            </div>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card"><div class="number" id="totalWarne">۰</div><div class="label">کل وارن‌ها</div></div>
+            <div class="stat-card"><div class="number danger" id="criticalWarne">۰</div><div class="label">بحرانی</div></div>
+            <div class="stat-card"><div class="number warning" id="warningWarne">۰</div><div class="label">هشدار</div></div>
+            <div class="stat-card"><div class="number success" id="resolvedWarne">۰</div><div class="label">برطرف شده</div></div>
+            <div class="stat-card"><div class="number" id="adminCount">۰</div><div class="label">ادمین‌های وارن‌خورده</div></div>
+        </div>
+
+        <!-- FILTERS -->
+        <div class="filters-bar">
+            <input type="text" id="searchInput" placeholder="🔍 جستجوی ادمین..." oninput="applyFilters()" />
+            <select id="priorityFilter" onchange="applyFilters()">
+                <option value="all">همه اولویت‌ها</option>
+                <option value="critical">بحرانی</option>
+                <option value="warning">هشدار</option>
+                <option value="info">اطلاع‌رسانی</option>
+            </select>
+            <select id="statusFilter" onchange="applyFilters()">
+                <option value="all">همه وضعیت‌ها</option>
+                <option value="open">باز</option>
+                <option value="resolved">برطرف شده</option>
+                <option value="rejected">رد شده</option>
+            </select>
+            <span style="color:var(--text2); font-size:0.8rem; margin-right:auto;">
+                <i class="fas fa-filter"></i> <span id="filterCount">۰</span> وارن یافت شد
+            </span>
+        </div>
+
+        <!-- ADMIN SUMMARY -->
+        <div class="admin-summary" id="adminSummary">
+            <h3><i class="fas fa-users"></i> لیست ادمین‌های وارن‌خورده</h3>
+            <div class="admin-summary-grid" id="adminSummaryGrid"></div>
+        </div>
+
+        <!-- ADD WARNE FORM -->
+        <div class="add-warne-section" id="addWarneSection">
+            <h3><i class="fas fa-pen-fancy"></i> ثبت وارن جدید برای ادمین</h3>
+            <div class="form-group">
+                <input type="text" id="warneAdminName" placeholder="👤 نام ادمین (مثال: Alireza_Admin)" />
+                <input type="text" id="warneAdminRank" placeholder="🎖 رنک (Head Admin, Sr. Admin, Admin)" />
+            </div>
+            <div class="form-group">
+                <input type="text" id="warneServer" placeholder="🖥 سرور (مثال: VMP #1)" />
+                <select id="warnePriority">
+                    <option value="info">ℹ️ اطلاع‌رسانی</option>
+                    <option value="warning" selected>⚠️ هشدار</option>
+                    <option value="critical">🔥 بحرانی</option>
+                </select>
+            </div>
+            <div class="form-group full">
+                <input type="text" id="warneTitle" placeholder="📌 عنوان وارن" />
+            </div>
+            <div class="form-group full">
+                <textarea id="warneDescription" placeholder="📝 توضیحات کامل وارن..."></textarea>
+            </div>
+            <div class="form-group">
+                <select id="warneStatus">
+                    <option value="open">🟢 باز</option>
+                    <option value="resolved">✅ برطرف شده</option>
+                    <option value="rejected">❌ رد شده</option>
+                </select>
+                <div style="display:flex; align-items:center; gap:10px; padding:0 0.5rem;">
+                    <input type="checkbox" id="duplicateCheck" style="width:20px; height:20px; accent-color:var(--gold);" />
+                    <label for="duplicateCheck" style="color:var(--text2); font-size:0.85rem; cursor:pointer;">
+                        <i class="fas fa-copy"></i> تکرار وارن (جمع‌آوری خودکار)
+                    </label>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button class="btn" onclick="clearForm()"><i class="fas fa-times"></i> لغو</button>
+                <button class="btn btn-success" onclick="addWarne()"><i class="fas fa-save"></i> ثبت وارن</button>
+            </div>
+        </div>
+
+        <!-- WARNE GRID -->
+        <div id="warneGrid" class="warne-grid"></div>
+
+        <!-- FOOTER -->
+        <div style="margin-top:2rem;font-size:0.7rem;color:#3f4d63;text-align:left;border-top:1px solid #1f2838;padding-top:1rem;display:flex;justify-content:space-between;flex-wrap:wrap;">
+            <span><i class="fas fa-cloud" style="color:var(--success);"></i> ذخیره‌سازی در JSONBin</span>
+            <span><i class="fas fa-globe"></i> قابل مشاهده برای همه کاربران</span>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  CONFIG - با اطلاعات شما تنظیم شده
+        // ============================================================
+        const ADMIN_PASSWORD = 'admin123';
+
+        // 📝 Bin ID شما
+        const BIN_ID = '6a426806da38895dfe0fdf8a';
+
+        // 🔑 API Key شما
+        const API_KEY = '$2a$10$2Dn20ZsOMHbfBXbiLNqeIupBDgRJq477Obv6eQDApB/fr747nNCde';
+
+        // ============================================================
+        //  CONSTANTS
+        // ============================================================
+        const SUSPEND_THRESHOLD = 3;
+        const STORAGE_KEY = 'vmp_warnes_data';
+        const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
+
+        let isAdmin = false;
+        let warnes = [];
+        let filteredWarnes = [];
+        let deleteTargetId = null;
+        let confirmAction = null;
+        let isSyncing = false;
+
+        // ============================================================
+        //  JSONBIN - LOAD
+        // ============================================================
+        async function loadFromCloud() {
+            try {
+                updateSyncStatus('syncing', 'در حال بارگذاری...');
+
+                const response = await fetch(JSONBIN_URL, {
+                    headers: {
+                        'X-Master-Key': API_KEY,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+                const record = data.record;
+
+                if (record && record.warnes) {
+                    warnes = record.warnes;
+                    saveToLocalStorage();
+                    renderAll();
+                    updateSyncStatus('online', 'همگام‌سازی شده');
+                    showToast(`${warnes.length} وارن از ابر بارگذاری شد`, 'success');
+                    return true;
+                }
+
+                warnes = [];
+                saveToLocalStorage();
+                renderAll();
+                updateSyncStatus('online', 'همگام‌سازی شده');
+                return true;
+
+            } catch (error) {
+                console.error('❌ Error loading from cloud:', error);
+                updateSyncStatus('offline', 'خطا در اتصال');
+
+                if (loadFromLocalStorage()) {
+                    renderAll();
+                    showToast('بارگذاری از حافظه محلی (آفلاین)', 'warning');
+                    return true;
+                }
+
+                warnes = [];
+                renderAll();
+                showToast('خطا در اتصال به ابر', 'error');
+                return false;
+            }
+        }
+
+        // ============================================================
+        //  JSONBIN - SAVE
+        // ============================================================
+        async function saveToCloud() {
+            if (isSyncing) return;
+            isSyncing = true;
+
+            try {
+                updateSyncStatus('syncing', 'در حال ذخیره‌سازی...');
+
+                const data = {
+                    warnes: warnes,
+                    lastUpdate: Date.now()
+                };
+
+                const response = await fetch(JSONBIN_URL, {
+                    method: 'PUT',
+                    headers: {
+                        'X-Master-Key': API_KEY,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                saveToLocalStorage();
+                updateSyncStatus('online', 'همگام‌سازی شده');
+                console.log('✅ Saved to JSONBin');
+
+            } catch (error) {
+                console.error('❌ Error saving to cloud:', error);
+                updateSyncStatus('offline', 'خطا در ذخیره‌سازی');
+                showToast('خطا در ذخیره‌سازی ابری', 'error');
+            } finally {
+                isSyncing = false;
+            }
+        }
+
+        // ============================================================
+        //  SYNC
+        // ============================================================
+        async function syncWithCloud() {
+            await loadFromCloud();
+            showToast('همگام‌سازی کامل شد', 'success');
+        }
+
+        function updateSyncStatus(status, text) {
+            const el = document.getElementById('syncStatus');
+            el.className = `sync-status ${status}`;
+            el.innerHTML = `<i class="fas fa-circle"></i> ${text}`;
+        }
+
+        // ============================================================
+        //  STORAGE
+        // ============================================================
+        function saveToLocalStorage() {
+            try {
+                const data = { warnes, lastUpdate: Date.now() };
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                return true;
+            } catch (error) {
+                console.error('❌ localStorage save error:', error);
+                return false;
+            }
+        }
+
+        function loadFromLocalStorage() {
+            try {
+                const data = localStorage.getItem(STORAGE_KEY);
+                if (data) {
+                    const parsed = JSON.parse(data);
+                    if (parsed && parsed.warnes && Array.isArray(parsed.warnes)) {
+                        warnes = parsed.warnes;
+                        return true;
+                    }
+                }
+                return false;
+            } catch (error) {
+                console.error('❌ localStorage load error:', error);
+                return false;
+            }
+        }
+
+        // ============================================================
+        //  INIT
+        // ============================================================
+        async function init() {
+            document.getElementById('loadingOverlay').classList.add('show');
+            
+            if (loadFromLocalStorage()) {
+                renderAll();
+                showToast(`${warnes.length} وارن از حافظه محلی`, 'info');
+            }
+            
+            await loadFromCloud();
+            
+            document.getElementById('loadingOverlay').classList.remove('show');
+        }
+
+        // ============================================================
+        //  SMART DUPLICATE DETECTION
+        // ============================================================
+        function checkDuplicate(adminName, title) {
+            return warnes.filter(w =>
+                w.adminName.toLowerCase() === adminName.toLowerCase() &&
+                w.title.toLowerCase() === title.toLowerCase() &&
+                w.status === 'open'
+            );
+        }
+
+        // ============================================================
+        //  CALCULATE ADMIN SCORE
+        // ============================================================
+        function calculateAdminScore(adminName) {
+            const adminWarnes = warnes.filter(w => w.adminName.toLowerCase() === adminName.toLowerCase());
+            let score = 0;
+            adminWarnes.forEach(w => {
+                if (w.status === 'open') {
+                    if (w.priority === 'critical') score += 3;
+                    else if (w.priority === 'warning') score += 2;
+                    else score += 1;
+                }
+                if (w.duplicateCount && w.duplicateCount > 1) {
+                    score += (w.duplicateCount - 1) * 1.5;
+                }
+            });
+            return Math.round(score * 10) / 10;
+        }
+
+        // ============================================================
+        //  ADD WARNE
+        // ============================================================
+        async function addWarne() {
+            if (!isAdmin) {
+                showToast('فقط ادمین می‌تواند وارن ثبت کند', 'error');
+                return;
+            }
+
+            const adminName = document.getElementById('warneAdminName').value.trim();
+            const adminRank = document.getElementById('warneAdminRank').value.trim();
+            const server = document.getElementById('warneServer').value.trim();
+            const title = document.getElementById('warneTitle').value.trim();
+            const description = document.getElementById('warneDescription').value.trim();
+            const priority = document.getElementById('warnePriority').value;
+            const status = document.getElementById('warneStatus').value;
+            const isDuplicate = document.getElementById('duplicateCheck').checked;
+
+            if (!adminName || !adminRank || !server || !title || !description) {
+                showToast('لطفاً همه فیلدها را پر کنید', 'error');
+                return;
+            }
+
+            const duplicates = checkDuplicate(adminName, title);
+
+            if (duplicates.length > 0 && isDuplicate) {
+                const existing = duplicates[0];
+                existing.duplicateCount = (existing.duplicateCount || 1) + 1;
+                existing.timestamp = Date.now();
+                existing.description += `\n[تکرار ${existing.duplicateCount}] ${description}`;
+
+                if (existing.duplicateCount >= 3 && existing.priority !== 'critical') {
+                    existing.priority = 'critical';
+                    showToast(`⚠️ وارن ${adminName} به بحرانی ارتقا یافت`, 'warning');
+                } else if (existing.duplicateCount >= 2 && existing.priority === 'info') {
+                    existing.priority = 'warning';
+                    showToast(`⚠️ وارن ${adminName} به هشدار ارتقا یافت`, 'warning');
+                }
+
+                renderAll();
+                saveToLocalStorage();
+                await saveToCloud();
+                clearForm();
+                showToast(`✅ وارن تکراری ${adminName} جمع‌آوری شد (${existing.duplicateCount} بار)`, 'success');
+                return;
+            }
+
+            const newWarne = {
+                id: Date.now() + Math.random() * 1000,
+                adminName,
+                adminRank,
+                server,
+                title,
+                description,
+                priority,
+                status,
+                timestamp: Date.now(),
+                duplicateCount: 1
+            };
+
+            warnes.unshift(newWarne);
+            renderAll();
+            saveToLocalStorage();
+            await saveToCloud();
+            clearForm();
+            showToast(`✅ وارن برای ${adminName} ثبت شد`, 'success');
+        }
+
+        // ============================================================
+        //  DELETE / RESOLVE / REJECT
+        // ============================================================
+        function deleteWarne(id) {
+            if (!isAdmin) {
+                showToast('فقط ادمین می‌تواند وارن حذف کند', 'error');
+                return;
+            }
+            deleteTargetId = id;
+            const warne = warnes.find(w => w.id === id);
+            document.getElementById('confirmMessage').textContent =
+                `آیا از حذف وارن "${warne ? warne.title : ''}" برای ${warne ? warne.adminName : ''} مطمئن هستید؟`;
+            confirmAction = 'delete';
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        async function resolveWarne(id) {
+            if (!isAdmin) {
+                showToast('فقط ادمین می‌تواند این کار را انجام دهد', 'error');
+                return;
+            }
+            const warne = warnes.find(w => w.id === id);
+            if (warne && warne.status === 'open') {
+                warne.status = 'resolved';
+                renderAll();
+                saveToLocalStorage();
+                await saveToCloud();
+                showToast(`✅ وارن ${warne.adminName} برطرف شد`, 'success');
+            }
+        }
+
+        async function rejectWarne(id) {
+            if (!isAdmin) {
+                showToast('فقط ادمین می‌تواند این کار را انجام دهد', 'error');
+                return;
+            }
+            const warne = warnes.find(w => w.id === id);
+            if (warne && warne.status === 'open') {
+                warne.status = 'rejected';
+                renderAll();
+                saveToLocalStorage();
+                await saveToCloud();
+                showToast(`❌ وارن ${warne.adminName} رد شد`, 'info');
+            }
+        }
+
+        // ============================================================
+        //  CONFIRM MODAL
+        // ============================================================
+        function closeConfirm() {
+            document.getElementById('confirmModal').classList.remove('show');
+            deleteTargetId = null;
+            confirmAction = null;
+        }
+
+        async function executeConfirm() {
+            if (confirmAction === 'delete' && deleteTargetId !== null) {
+                warnes = warnes.filter(w => w.id !== deleteTargetId);
+                renderAll();
+                saveToLocalStorage();
+                await saveToCloud();
+                closeConfirm();
+                showToast('وارن با موفقیت حذف شد', 'success');
+            }
+        }
+
+        // ============================================================
+        //  FILTERS
+        // ============================================================
+        function applyFilters() {
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            const priority = document.getElementById('priorityFilter').value;
+            const status = document.getElementById('statusFilter').value;
+
+            filteredWarnes = warnes.filter(w => {
+                const matchSearch = w.adminName.toLowerCase().includes(search) ||
+                    w.title.toLowerCase().includes(search) ||
+                    w.server.toLowerCase().includes(search);
+                const matchPriority = priority === 'all' || w.priority === priority;
+                const matchStatus = status === 'all' || w.status === status;
+                return matchSearch && matchPriority && matchStatus;
+            });
+
+            document.getElementById('filterCount').textContent = filteredWarnes.length;
+            renderWarne(filteredWarnes);
+        }
+
+        // ============================================================
+        //  RENDER ALL
+        // ============================================================
+        function renderAll() {
+            renderStats();
+            renderAdminSummary();
+            applyFilters();
+            updateCount();
+        }
+
+        // ============================================================
+        //  RENDER STATS
+        // ============================================================
+        function renderStats() {
+            const total = warnes.length;
+            const critical = warnes.filter(w => w.priority === 'critical' && w.status === 'open').length;
+            const warning = warnes.filter(w => w.priority === 'warning' && w.status === 'open').length;
+            const resolved = warnes.filter(w => w.status === 'resolved').length;
+            const uniqueAdmins = new Set(warnes.map(w => w.adminName.toLowerCase())).size;
+
+            document.getElementById('totalWarne').textContent = total;
+            document.getElementById('criticalWarne').textContent = critical;
+            document.getElementById('warningWarne').textContent = warning;
+            document.getElementById('resolvedWarne').textContent = resolved;
+            document.getElementById('adminCount').textContent = uniqueAdmins;
+        }
+
+        // ============================================================
+        //  RENDER ADMIN SUMMARY
+        // ============================================================
+        function renderAdminSummary() {
+            const grid = document.getElementById('adminSummaryGrid');
+            const adminMap = {};
+
+            warnes.forEach(w => {
+                const key = w.adminName.toLowerCase();
+                if (!adminMap[key]) {
+                    adminMap[key] = {
+                        name: w.adminName,
+                        rank: w.adminRank,
+                        count: 0,
+                        critical: 0,
+                        open: 0,
+                        score: 0
+                    };
+                }
+                adminMap[key].count++;
+                if (w.priority === 'critical') adminMap[key].critical++;
+                if (w.status === 'open') adminMap[key].open++;
+            });
+
+            Object.values(adminMap).forEach(a => {
+                a.score = calculateAdminScore(a.name);
+            });
+
+            const sorted = Object.values(adminMap).sort((a, b) => b.score - a.score);
+
+            if (sorted.length === 0) {
+                grid.innerHTML = '<div style="color:var(--text2); grid-column:1/-1; text-align:center;">✅ هیچ ادمینی وارن ندارد</div>';
+                return;
+            }
+
+            grid.innerHTML = sorted.map(a => {
+                let countClass = 'safe';
+                if (a.critical >= 2) countClass = 'danger';
+                else if (a.critical >= 1) countClass = 'warning';
+
+                return `
+                    <div class="admin-item" onclick="searchAdmin('${a.name}')">
+                        <div class="admin-info">
+                            <span class="admin-name">${escapeHtml(a.name)}</span>
+                            <span class="admin-rank"><i class="fas fa-user-tag"></i> ${escapeHtml(a.rank)}</span>
+                        </div>
+                        <div style="text-align:center;">
+                            <span class="admin-count ${countClass}">${a.count}</span>
+                            <div style="font-size:0.6rem; color:var(--text2);">امتیاز: ${a.score}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function searchAdmin(name) {
+            document.getElementById('searchInput').value = name;
+            applyFilters();
+        }
+
+        // ============================================================
+        //  RENDER WARNE
+        // ============================================================
+        function renderWarne(warnesToRender) {
+            const grid = document.getElementById('warneGrid');
+            const data = warnesToRender || warnes;
+
+            if (!data || data.length === 0) {
+                grid.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-check-circle" style="color:var(--success);"></i>
+                        <p>هیچ وارنی یافت نشد</p>
+                        <div class="sub-text">${warnes.length > 0 ? 'با فیلترهای فعلی همخوانی ندارد' : 'همه ادمین‌ها در حال فعالیت صحیح هستند'}</div>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = data.map(w => {
+                const priorityLabels = {
+                    critical: '🔥 بحرانی',
+                    warning: '⚠️ هشدار',
+                    info: 'ℹ️ اطلاع‌رسانی'
+                };
+
+                const statusLabels = {
+                    open: '🟢 باز',
+                    resolved: '✅ برطرف شده',
+                    rejected: '❌ رد شده'
+                };
+
+                const isDuplicate = w.duplicateCount && w.duplicateCount > 1;
+                const initial = w.adminName.charAt(0).toUpperCase();
+
+                return `
+                    <div class="warne-card">
+                        <div class="priority-badge ${w.priority}">
+                            ${priorityLabels[w.priority] || 'ℹ️'}
+                        </div>
+                        ${isDuplicate ? `<div class="warne-number"><i class="fas fa-copy"></i> ${w.duplicateCount}x</div>` : ''}
+                        <div class="warne-id">#${String(w.id).slice(-6)}</div>
+
+                        <div class="warne-admin">
+                            <div class="admin-avatar">${initial}</div>
+                            <div class="admin-info">
+                                <div class="admin-name">${escapeHtml(w.adminName)}</div>
+                                <div class="admin-rank"><i class="fas fa-user-tag"></i> ${escapeHtml(w.adminRank)}</div>
+                            </div>
+                            <div class="admin-score">امتیاز: ${calculateAdminScore(w.adminName)}</div>
+                        </div>
+
+                        <div class="warne-title">
+                            <i class="fas fa-server"></i> ${escapeHtml(w.server)}
+                        </div>
+                        <div class="warne-title">${escapeHtml(w.title)}</div>
+                        <div class="warne-desc">${escapeHtml(w.description)}</div>
+
+                        <div class="warne-meta">
+                            <span class="time">
+                                <i class="far fa-clock"></i> ${timeAgo(w.timestamp)}
+                            </span>
+                            <span class="status ${w.status}">
+                                ${statusLabels[w.status] || '🟢 باز'}
+                            </span>
+                            ${isDuplicate ? `<span style="color:var(--warning); font-size:0.6rem;"><i class="fas fa-layer-group"></i> ${w.duplicateCount}</span>` : ''}
+                        </div>
+
+                        ${isAdmin ? `
+                            <div class="warne-actions">
+                                ${w.status === 'open' ? `
+                                    <button class="btn btn-success btn-xs" onclick="resolveWarne(${w.id})">
+                                        <i class="fas fa-check"></i> برطرف
+                                    </button>
+                                    <button class="btn btn-warning btn-xs" onclick="rejectWarne(${w.id})">
+                                        <i class="fas fa-times"></i> رد
+                                    </button>
+                                ` : ''}
+                                <button class="btn btn-danger btn-xs" onclick="deleteWarne(${w.id})">
+                                    <i class="fas fa-trash"></i> حذف
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ============================================================
+        //  UPDATE COUNT
+        // ============================================================
+        function updateCount() {
+            const openCount = warnes.filter(w => w.status === 'open').length;
+            document.getElementById('countDisplay').textContent = openCount;
+        }
+
+        // ============================================================
+        //  LOGIN / LOGOUT
+        // ============================================================
+        function loginAdmin() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                document.getElementById('loginOverlay').classList.remove('show');
+                document.getElementById('adminBadge').style.display = 'block';
+                document.getElementById('adminLoginBtn').style.display = 'none';
+                document.getElementById('adminLogoutBtn').style.display = 'inline-flex';
+                document.getElementById('addWarneSection').classList.add('visible');
+                document.getElementById('loginError').textContent = '';
+                document.getElementById('adminPassword').value = '';
+                renderAll();
+                showToast('خوش آمدید ادمین ارشد', 'success');
+            } else {
+                document.getElementById('loginError').textContent = '❌ رمز عبور اشتباه است';
+            }
+        }
+
+        function logoutAdmin() {
+            isAdmin = false;
+            document.getElementById('adminBadge').style.display = 'none';
+            document.getElementById('adminLoginBtn').style.display = 'inline-flex';
+            document.getElementById('adminLogoutBtn').style.display = 'none';
+            document.getElementById('addWarneSection').classList.remove('visible');
+            renderAll();
+            showToast('خروج از حساب مدیریت', 'info');
+        }
+
+        function showLogin() {
+            document.getElementById('loginOverlay').classList.add('show');
+            document.getElementById('adminPassword').focus();
+            document.getElementById('loginError').textContent = '';
+        }
+
+        function closeLogin() {
+            document.getElementById('loginOverlay').classList.remove('show');
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('loginError').textContent = '';
+        }
+
+        // ============================================================
+        //  UTILITY
+        // ============================================================
+        function clearForm() {
+            document.getElementById('warneAdminName').value = '';
+            document.getElementById('warneAdminRank').value = '';
+            document.getElementById('warneServer').value = '';
+            document.getElementById('warneTitle').value = '';
+            document.getElementById('warneDescription').value = '';
+            document.getElementById('warnePriority').value = 'warning';
+            document.getElementById('warneStatus').value = 'open';
+            document.getElementById('duplicateCheck').checked = false;
+        }
+
+        function refreshWarne() {
+            syncWithCloud();
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function timeAgo(timestamp) {
+            const seconds = Math.floor((Date.now() - timestamp) / 1000);
+            if (seconds < 60) return 'لحظاتی پیش';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return `${minutes} دقیقه پیش`;
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return `${hours} ساعت پیش`;
+            const days = Math.floor(hours / 24);
+            if (days < 7) return `${days} روز پیش`;
+            const weeks = Math.floor(days / 7);
+            return `${weeks} هفته پیش`;
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            toastMessage.textContent = message;
+            toast.className = `toast show ${type}`;
+            clearTimeout(toast.timeout);
+            toast.timeout = setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+
+        // ============================================================
+        //  KEYBOARD SHORTCUTS
+        // ============================================================
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeLogin();
+                closeConfirm();
+            }
+            if (e.key === 'Enter' && document.getElementById('loginOverlay').classList.contains('show')) {
+                loginAdmin();
+            }
+        });
+
+        // ============================================================
+        //  START
+        // ============================================================
+        init();
+        console.log('🚀 VMP Warne System v10.0 - JSONBin Cloud');
+        console.log('📌 همه کاربران وارن‌ها را می‌بینند');
+    </script>
+</body>
+</html>
