@@ -208,9 +208,9 @@
         <!-- STATS -->
         <div class="stats-grid" id="statsGrid">
             <div class="stat-card"><div class="number" id="totalWarne">۰</div><div class="label">کل وارن‌ها</div></div>
-            <div class="stat-card"><div class="number danger" id="criticalWarne">۰</div><div class="label">بحرانی</div></div>
-            <div class="stat-card"><div class="number warning" id="warningWarne">۰</div><div class="label">هشدار</div></div>
-            <div class="stat-card"><div class="number success" id="resolvedWarne">۰</div><div class="label">برطرف شده</div></div>
+            <div class="stat-card"><div class="number danger" id="criticalWarne">۰</div><div class="label">اخطار3(فایر)</div></div>
+            <div class="stat-card"><div class="number warning" id="warningWarne">۰</div><div class="label">اخطار2(رنک دون)</div></div>
+            <div class="stat-card"><div class="number success" id="resolvedWarne">۰</div><div class="label">تایید شده</div></div>
             <div class="stat-card"><div class="number" id="adminCount">۰</div><div class="label">ادمین‌های وارن‌خورده</div></div>
         </div>
 
@@ -219,14 +219,14 @@
             <input type="text" id="searchInput" placeholder="🔍 جستجوی ادمین..." oninput="applyFilters()" />
             <select id="priorityFilter" onchange="applyFilters()">
                 <option value="all">همه اولویت‌ها</option>
-                <option value="critical">بحرانی</option>
-                <option value="warning">هشدار</option>
-                <option value="info">اطلاع‌رسانی</option>
+                <option value="critical">اخطار3(فایر)</option>
+                <option value="warning">اخطار2(رنک دون)</option>
+                <option value="info">ااخطار1</option>
             </select>
             <select id="statusFilter" onchange="applyFilters()">
                 <option value="all">همه وضعیت‌ها</option>
                 <option value="open">باز</option>
-                <option value="resolved">برطرف شده</option>
+                <option value="resolved">تایید شده</option>
                 <option value="rejected">رد شده</option>
             </select>
             <span style="color:var(--text2); font-size:0.8rem; margin-right:auto;">
@@ -250,9 +250,9 @@
             <div class="form-group">
                 <input type="text" id="warneServer" placeholder="🖥 سرور (مثال: VMP #1)" />
                 <select id="warnePriority">
-                    <option value="info">ℹ️ اطلاع‌رسانی</option>
-                    <option value="warning" selected>⚠️ هشدار</option>
-                    <option value="critical">🔥 بحرانی</option>
+                    <option value="info">ℹ️ ااخطار1</option>
+                    <option value="warning" selected>⚠️ اخطار2(رنک دون)</option>
+                    <option value="critical">🔥 اخطار3(فایر)</option>
                 </select>
             </div>
             <div class="form-group full">
@@ -264,7 +264,7 @@
             <div class="form-group">
                 <select id="warneStatus">
                     <option value="open">🟢 باز</option>
-                    <option value="resolved">✅ برطرف شده</option>
+                    <option value="resolved">✅ تایید شده</option>
                     <option value="rejected">❌ رد شده</option>
                 </select>
                 <div style="display:flex; align-items:center; gap:10px; padding:0 0.5rem;">
@@ -534,10 +534,10 @@
 
                 if (existing.duplicateCount >= 3 && existing.priority !== 'critical') {
                     existing.priority = 'critical';
-                    showToast(`⚠️ وارن ${adminName} به بحرانی ارتقا یافت`, 'warning');
+                    showToast(`⚠️ وارن ${adminName} به اخطار3(فایر) ارتقا یافت`, 'warning');
                 } else if (existing.duplicateCount >= 2 && existing.priority === 'info') {
                     existing.priority = 'warning';
-                    showToast(`⚠️ وارن ${adminName} به هشدار ارتقا یافت`, 'warning');
+                    showToast(`⚠️ وارن ${adminName} به اخطار2(رنک دون) ارتقا یافت`, 'warning');
                 }
 
                 renderAll();
@@ -596,7 +596,7 @@
                 renderAll();
                 saveToLocalStorage();
                 await saveToCloud();
-                showToast(`✅ وارن ${warne.adminName} برطرف شد`, 'success');
+                showToast(`✅ وارن ${warne.adminName} تایید شد`, 'success');
             }
         }
 
@@ -763,14 +763,14 @@
 
             grid.innerHTML = data.map(w => {
                 const priorityLabels = {
-                    critical: '🔥 بحرانی',
-                    warning: '⚠️ هشدار',
-                    info: 'ℹ️ اطلاع‌رسانی'
+                    critical: '🔥 اخطار3(فایر)',
+                    warning: '⚠️ اخطار2(رنک دون)',
+                    info: 'ℹ️ ااخطار1'
                 };
 
                 const statusLabels = {
                     open: '🟢 باز',
-                    resolved: '✅ برطرف شده',
+                    resolved: '✅ تایید شده',
                     rejected: '❌ رد شده'
                 };
 
@@ -814,7 +814,7 @@
                             <div class="warne-actions">
                                 ${w.status === 'open' ? `
                                     <button class="btn btn-success btn-xs" onclick="resolveWarne(${w.id})">
-                                        <i class="fas fa-check"></i> برطرف
+                                        <i class="fas fa-check"></i> تایید
                                     </button>
                                     <button class="btn btn-warning btn-xs" onclick="rejectWarne(${w.id})">
                                         <i class="fas fa-times"></i> رد
